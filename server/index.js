@@ -5,10 +5,12 @@ const UserModel= require("./models/user")
 const SkillModel = require("./models/Skill")
 const bodyParser = require('body-parser');
 const Authroutes = require("./routes/auth.routes");
+const projroutes = require("./routes/projectRoute");
+const msgroutes = require("./routes/conversationRoute");
 const app = express()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
-const fuct = require('./others/database');
+
 
 app.listen(3000,()=>{
     console.log("server is running")
@@ -18,7 +20,7 @@ app.listen(3000,()=>{
 
 app.use(express.json());
 app.use(cors());
-app.use('/api', Authroutes);
+app.use('/api', Authroutes, projroutes,msgroutes);
 
 app.get('/profile', authenticateToken, (req, res) => {
     res.json(req.user);
