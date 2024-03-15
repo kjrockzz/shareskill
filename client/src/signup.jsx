@@ -1,42 +1,61 @@
+import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import { Dimmer, Loader } from 'semantic-ui-react'; // Import Dimmer and Loader from semantic-ui-react
-import 'semantic-ui-css/semantic.min.css'; // Import semantic-ui-css for styling
+import { Dimmer, Loader } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css';
+import Select from 'react-select'; // Import react-select
 
-import backgroundImage from './ss2.jpg'; // Import your image file
+import backgroundImage from './ss2.jpg';
 
 function Signup() {
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [pass, setPass] = useState();
-  const [loading, setLoading] = useState(false); // State to manage loading state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const skillOptions = [
+    { value: 'JavaScript', label: 'JavaScript' },
+    { value: 'Python', label: 'Python' },
+    { value: 'Java', label: 'Java' },
+    { value: 'C++', label: 'C++' },
+    // Add more skills as needed
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when form is submitted
-    axios.post('', { name, email, pass })
+    setLoading(true);
+
+    // Create FormData to handle file upload
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("pass", pass);
+    formData.append("profilePicture", profilePicture);
+    formData.append("skills", selectedSkills.map(skill => skill.value).join(',')); // Join selected skills into a comma-separated string
+
+    axios.post("", formData)
       .then(result => {
         console.log(result);
-        setLoading(false); // Set loading to false on successful response
+        setLoading(false);
       })
       .catch(err => {
         console.log(err);
-        setLoading(false); // Set loading to false on error
+        setLoading(false);
       });
   };
 
   return (
     <div className="d-flex vh-100">
-      {/* Background Picture */}
-      <div className="flex-grow-1 p-3" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', }}>
+      <div className="flex-grow-1 p-3" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
         <h2>About Skill Share</h2>
-        {<p1>This website helps you connect with people with whom you can collaboratively work on a project of your own choice. Here you'll find people from all around the world.</p1>}
+        <p1>This website helps you connect with people with whom you can collaboratively work on a project of your own choice. Here you'll find people from all around the world.</p1>
       </div>
 
-      {/* Registration Form on the right */}
-      <div className="bg-facebook p-3 rounded w-25"> {/* Set background color to the color of Facebook */}
-        <Dimmer active={loading}> {/* Display loading spinner when loading is true */}
+      <div className="bg-facebook p-3 rounded w-25">
+        <Dimmer active={loading}>
           <Loader />
         </Dimmer>
         <h2 className="ui center aligned icon header">
@@ -44,7 +63,86 @@ function Signup() {
           Register
         </h2>
         <form onSubmit={handleSubmit}>
-          {/* ... (rest of the form remains the same) */}
+          {/* Existing form fields */}
+          <div className="mb-3">
+            <label htmlFor="name">
+              <strong>Name</strong>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Name"
+              autoComplete="off"
+              name="name"
+              className="form-control rounded-0"
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="email">
+              <strong>Email</strong>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter Email"
+              autoComplete="off"
+              name="email"
+              className="form-control rounded-0"
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+          </div>
+          <div className="mb-3">
+            <label htmlFor="password">
+              <strong>Password</strong>
+            </label>
+            <input
+              type="password"
+              placeholder="Enter password"
+              autoComplete="off"
+              name="password"
+              className="form-control rounded-0"
+              onChange={(e) => {
+                setPass(e.target.value);
+              }}
+            />
+          </div>
+
+          {/* Profile Picture */}
+          <div className="mb-3">
+            <label htmlFor="profilePicture">
+              <strong>Profile Picture</strong>
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              name="profilePicture"
+              onChange={(e) => setProfilePicture(e.target.files[0])}
+              className="form-control rounded-0"
+            />
+          </div>
+
+          {/* Skills Dropdown */}
+          <div className="mb-3">
+            <label htmlFor="skills">
+              <strong>Skills</strong>
+            </label>
+            <Select
+              isMulti
+              options={skillOptions}
+              value={selectedSkills}
+              onChange={(selected) => setSelectedSkills(selected)}
+            />
+          </div>
+
+          {/* Submit button */}
+          <div>
+            <button type="submit" className="ui primary button">
+              Register
+            </button>
+          </div>
         </form>
         <p>Already have an Account</p>
         <Link to="/login" className="btn btn-default border w-50 bg-light rounded-0 text-decoration-none">

@@ -12,6 +12,8 @@ function App() {
     <Route path='/register' element={<Signup />} ></Route>
     <Route path='/login' element={<Login />} ></Route>
     <Route path='/home' element={<HomePage />} ></Route>
+    <Route path= '/homefeed' element={<homefeed />} ></Route>
+   
   </Routes>
   </BrowserRouter> 
   );
