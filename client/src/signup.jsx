@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import { Dimmer, Loader } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
 import Select from 'react-select'; // Import react-select
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -48,9 +47,10 @@ const handleSubmit = (e) => {
         alert('Username is not unique');
         return;
     }
-    
+    var a=selectedSkills.map(item => item.value);
+    console.log(a);
     console.log(image);
-    axios.post('http://localhost:3000/api/register', {name,pass,email,skills:JSON.stringify(selectedSkills),bio,image: base64})
+    axios.post('http://localhost:3000/api/register', {name,pass,email,skills:JSON.stringify(a),bio,image: base64})
         .then(result => {
             console.log(result);
             navigate('/login');
@@ -191,12 +191,11 @@ var loading = false;
               })}
               value={selectedSkills}
               onChange={(selected)=> {
-               var a=selected.map(item => item.value);
-                console.log(a);
-                setSelectedSkills(a)}}
+                setSelectedSkills(selected)
+                
+              }}
             />
-            {console.log("a",selectedSkills)}
-            
+           
           </div>
           
 

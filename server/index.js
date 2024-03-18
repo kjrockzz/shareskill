@@ -12,11 +12,17 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 
 
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+
 app.listen(3000,()=>{
     console.log("server is running")
 })
 
-
+app.use(cors({
+    origin: 'http://localhost:5173'
+  }));
 
 app.use(express.json());
 app.use(cors());
