@@ -1,57 +1,107 @@
-import React from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import { Dimmer, Loader } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import Select from 'react-select'; // Import react-select
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import backgroundImage from './ss2.jpg';
 
 function Signup() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null);
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [pass, setPass] = useState('');
+  const [selectedSkills, setSelectedSkills] = useState([]); // State for selected skills array
+  const [skills, setSkills] = useState([]); // State for skills fetched from database
+  const [bio, setBio] = useState('');
+  const [image, setImage] = useState(null);
+  const [base64, setbase64] = useState('');
+  const [isNameUnique, setIsNameUnique] = useState(true); // State to track uniqueness
+  const navigate = useNavigate();
 
-  const skillOptions = [
-    { value: 'JavaScript', label: 'JavaScript' },
-    { value: 'Python', label: 'Python' },
-    { value: 'Java', label: 'Java' },
-    { value: 'C++', label: 'C++' },
-    // Add more skills as needed
-  ];
 
-  const handleSubmit = (e) => {
+
+
+  useEffect(() => {
+    // Fetch skills from backend when component mounts
+    axios.get('http://localhost:3000/api/getSkills')
+        .then(response => {
+            
+            const s =response.data.skills;
+            const skl=[]
+            for (const [key, value] of Object.entries(s)){
+                skl.push(value["skill"])
+            }
+            setSkills(skl);
+            console.log(skills);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}, []);
+
+const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
+    // Check if name is unique before submitting
+    if (!isNameUnique) {
+        alert('Username is not unique');
+        return;
+    }
+    
+    console.log(image);
+    axios.post('http://localhost:3000/api/register', {name,pass,email,skills:JSON.stringify(selectedSkills),bio,image: base64})
+        .then(result => {
+            console.log(result);
+            navigate('/login');
+        })
+        .catch(err => console.log(err));
+};
 
-    // Create FormData to handle file upload
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("pass", pass);
-    formData.append("profilePicture", profilePicture);
-    formData.append("skills", selectedSkills.map(skill => skill.value).join(',')); // Join selected skills into a comma-separated string
+const handleCheckUniqueName = () => {
+    axios.post('http://localhost:3000/api/checkUniqueName', { name: name })
+        .then(response => {
+            setIsNameUnique(response.data.isUnique);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+};
 
-    axios.post("", formData)
-      .then(result => {
-        console.log(result);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log(err);
-        setLoading(false);
-      });
+const convertToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64String = reader.result;
+        setbase64(base64String);
+      // Here you can send the base64String to your backend to store in MongoDB
+    //   console.log(base64String);
+    };
+    reader.onerror = (error) => {
+      console.error('Error converting to base64:', error);
+    };
   };
+const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+    convertToBase64(file);
+};
 
+const handleSkillChange = (e) => {
+    const skill = e.target.value;
+    if (e.target.checked) {
+        setSelectedSkills([...selectedSkills, skill]);
+    } else {
+        setSelectedSkills(selectedSkills.filter(selectedSkill => selectedSkill !== skill));
+    }
+};
+
+var loading = false;
   return (
     <div className="d-flex vh-100">
       <div className="flex-grow-1 p-3" style={{ backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover' }}>
         <h2>About Skill Share</h2>
-        <p1>This website helps you connect with people with whom you can collaboratively work on a project of your own choice. Here you'll find people from all around the world.</p1>
+        <p>This website helps you connect with people with whom you can collaboratively work on a project of your own choice. Here you'll find people from all around the world.</p>
       </div>
 
       <div className="bg-facebook p-3 rounded w-25">
@@ -74,9 +124,12 @@ function Signup() {
               autoComplete="off"
               name="name"
               className="form-control rounded-0"
+              value={name}
               onChange={(e) => {
                 setName(e.target.value);
+                setIsNameUnique(true);
               }}
+              onBlur={handleCheckUniqueName}
             />
           </div>
           <div className="mb-3">
@@ -88,6 +141,7 @@ function Signup() {
               placeholder="Enter Email"
               autoComplete="off"
               name="email"
+              value={email}
               className="form-control rounded-0"
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -104,6 +158,7 @@ function Signup() {
               autoComplete="off"
               name="password"
               className="form-control rounded-0"
+              value={pass}
               onChange={(e) => {
                 setPass(e.target.value);
               }}
@@ -119,7 +174,7 @@ function Signup() {
               type="file"
               accept="image/*"
               name="profilePicture"
-              onChange={(e) => setProfilePicture(e.target.files[0])}
+              onChange= {handleImageChange}
               className="form-control rounded-0"
             />
           </div>
@@ -131,11 +186,19 @@ function Signup() {
             </label>
             <Select
               isMulti
-              options={skillOptions}
+              options={skills.map(item => {
+                return { value: item, label: item };
+              })}
               value={selectedSkills}
-              onChange={(selected) => setSelectedSkills(selected)}
+              onChange={(selected)=> {
+               var a=selected.map(item => item.value);
+                console.log(a);
+                setSelectedSkills(a)}}
             />
+            {console.log("a",selectedSkills)}
+            
           </div>
+          
 
           {/* Submit button */}
           <div>
