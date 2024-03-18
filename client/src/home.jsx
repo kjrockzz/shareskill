@@ -1,7 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 import './HomePage.css';
 
 function HomePage() {
+
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3000/profile', {
+          headers: { Authorization: token }
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.error(error.response.data.message);
+        localStorage.removeItem('token'); // Remove invalid token from localStorage
+        navigate('/login'); // Redirect to login page
+      }
+    };
+    fetchData();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
+
   // Sample data for demonstration purposes
   const feedData = [
     {
@@ -115,15 +143,16 @@ function HomePage() {
 
   return (
     <div className="ui grid">
-      <div className="four wide column">
-        {/* Left Block */}
-        <div className="ui vertical menu">
-          <a className="active item">Chat</a>
-          <a className="item">Profile</a>
-          <a className="item">News</a>
-          <a className="item">Settings</a>
-        </div>
+    <div className="four wide column">
+      {/* Left Block */}
+      <div className="ui vertical menu">
+        <a className="active item">Chat</a>
+        <a className="item">Profile</a>
+        <a className="item">News</a>
+        <a className="item">Settings</a>
+        <a className="item" onClick={handleLogout}>Logout</a> {/* Logout hyperlink */}
       </div>
+    </div>
       <div className="twelve wide column">
         {/* Main Content */}
         <div className="ui segment">

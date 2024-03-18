@@ -12,6 +12,11 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useState } from "react";
+
+import axios from 'axios'
+import {useNavigate} from "react-router-dom"
+
 
 function Copyright(props) {
   return (
@@ -31,14 +36,24 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+  const [valid,setvalid] = useState(true)
+  const navigate = useNavigate()
+  const handleSubmit=async (e)=> {
+      e.preventDefault()
+      const formData = new FormData(e.currentTarget);
+      const email = formData.get('email');
+      const pass = formData.get('password');
+      console.log("email", email, " password: ", pass); // Corrected "password" to "pass"
+      try {
+          const response = await axios.post('http://localhost:3000/api/login', { email, pass });
+          console.log(response.data)
+          localStorage.setItem('token', response.data.token);
+          navigate('/home'); // Redirect to profile page after successful login
+        } catch (error) {
+          setvalid(false);
+          console.error(error.response.data.message);
+        }
+};
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -84,6 +99,7 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                
               />
               <TextField
                 margin="normal"
@@ -114,7 +130,7 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="#" variant="body2">
+                  <Link href="/register" variant="body2">
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
