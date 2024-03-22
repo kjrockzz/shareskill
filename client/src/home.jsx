@@ -6,6 +6,7 @@ import './HomePage.css';
 function HomePage() {
 
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,7 +16,12 @@ function HomePage() {
         const response = await axios.get('http://localhost:3000/profile', {
           headers: { Authorization: token }
         });
-        setUser(response.data);
+
+        setUser(prevUser => {
+          console.log(response.data); // Log inside setUser callback
+          return response.data;
+        });
+        setLoading(false); // Set loading to false after data retrieval
       } catch (error) {
         console.error(error.response.data.message);
         localStorage.removeItem('token'); // Remove invalid token from localStorage
@@ -29,6 +35,8 @@ function HomePage() {
     localStorage.removeItem('token');
     navigate('/login');
   };
+
+  
 
   // Sample data for demonstration purposes
   const feedData = [
@@ -141,6 +149,9 @@ function HomePage() {
     // Add more posts as needed
   ];
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="ui grid">
     <div className="four wide column">
@@ -154,9 +165,12 @@ function HomePage() {
       </div>
     </div>
       <div className="twelve wide column">
-        {/* Main Content */}
+        {/* Main Content */
+        
+}
         <div className="ui segment">
-          <p>Welcome to the Home Page!</p>
+        <p>hello {user.name}!</p>
+
           <div className="ui feed">
             {feedData.map((post, index) => (
               <div className="event post" key={index}>
