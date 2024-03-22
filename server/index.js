@@ -36,21 +36,23 @@ app.get('/profile', authenticateToken, (req, res) => {
 const database = module.exports =()=>{
     const connectionParams = {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        ssl: true
     }
     try {
-        mongoose.connect("mongodb://localhost:27017/first")
+        // mongoose.connect("mongodb://localhost:27017/first")
         // mongoose.connect("mongodb+srv://kashik:shareskill321@shareskilll.w8l807t.mongodb.net/maindb?retryWrites=true&w=majority")
+        mongoose.connect("mongodb+srv://kashik:shareskill321@shareskilll.w8l807t.mongodb.net/maindb?retryWrites=true&w=majority")
         console.log("database connection successful");
-    
-    } catch (error) {
+     
+    } catch (error) { 
         console.log(error)
-        console.log("database connection failed"); 
+        console.log("database connection failed");  
     }
 }
 
 database();
-
+ 
 function authenticateToken(req, res, next) {
     const token = req.headers['authorization'];
     if (!token) {
