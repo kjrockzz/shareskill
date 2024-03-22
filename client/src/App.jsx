@@ -4,6 +4,9 @@ import Signup from './signup'
 import {BrowserRouter, Routes , Route} from "react-router-dom"
 import Login from './Login';
 import HomePage from "./home"
+import Chat from "./chat"
+import Profilepage from "./profile"
+
 
 function App() {
   return(
@@ -13,7 +16,8 @@ function App() {
     <Route path='/login' element={<Login />} ></Route>
     <Route path='/home' element={<HomePage />} ></Route>
     <Route path= '/homefeed' element={<homefeed />} ></Route>
-   
+    <Route path= '/chat' element={<Chat />} ></Route>
+    <Route path= '/profile' element={<Profilepage />} ></Route>
   </Routes>
   </BrowserRouter> 
   );
