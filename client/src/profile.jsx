@@ -17,7 +17,43 @@ import {
   MDBListGroupItem
 } from 'mdb-react-ui-kit';
 
+import { useState, useEffect } from "react";
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+
+
+
 export default function ProfilePage() {
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3000/profile', {
+          headers: { Authorization: token }
+        });
+
+        setUser(prevUser => {
+          console.log(response.data); // Log inside setUser callback
+          return response.data;
+        });
+        setLoading(false); // Set loading to false after data retrieval
+      } catch (error) {
+        console.error(error.response.data.message);
+        localStorage.removeItem('token'); // Remove invalid token from localStorage
+        navigate('/login'); // Redirect to login page
+      }
+    };
+    fetchData();
+  }, [navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <section style={{ backgroundColor: '#eee' }}>
       <MDBContainer className="py-5">
@@ -25,12 +61,11 @@ export default function ProfilePage() {
           <MDBCol>
             <MDBBreadcrumb className="bg-light rounded-3 p-3 mb-4">
               <MDBBreadcrumbItem>
-                <a href='#'>Home</a>
+                <a href='/home'>Home</a>
               </MDBBreadcrumbItem>
               <MDBBreadcrumbItem>
                 <a href="#">User</a>
               </MDBBreadcrumbItem>
-              <MDBBreadcrumbItem active>User Profile</MDBBreadcrumbItem>
             </MDBBreadcrumb>
           </MDBCol>
         </MDBRow>
@@ -45,8 +80,7 @@ export default function ProfilePage() {
                   className="rounded-circle"
                   style={{ width: '150px' }}
                   fluid />
-                <p className="text-muted mb-1">Full Stack Developer</p>
-                <p className="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                <p className="text-muted mb-1">{user.name}</p>
                 <div className="d-flex justify-content-center mb-2">
                   <MDBBtn>Follow</MDBBtn>
                   <MDBBtn outline className="ms-1">Message</MDBBtn>

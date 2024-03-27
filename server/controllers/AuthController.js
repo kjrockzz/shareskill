@@ -45,7 +45,6 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     const{email,pass}= req.body;
-    console.log(email,pass);
     const user = await UserModel.findOne({ email });
     if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -54,7 +53,7 @@ exports.login = async (req, res) => {
     if (!isValidPassword) {
         return res.status(401).json({ message: 'Invalid password' });
     }
-    const token = jwt.sign({ userId: user._id,name: user.name,email:user.email }, 'your_secret_key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id,name: user.name,email:user.email}, 'your_secret_key', { expiresIn: '1h' });
     res.json({ token });
 
 };
@@ -88,3 +87,24 @@ exports.getSkills = async (req, res) => {
     }
     // Implementation of /getSkills route
 };
+
+exports.user = async (req, res) => {
+    try {
+        const userId = req.params.userId; 
+        // console.log(userId);
+        let user= await UserModel.findById(userId);
+        user={userId:user._id,email:user.email , name:user.name, profile: user.profile}
+        res.status(200).json( user);
+
+    } catch (error) {
+        console.log(error,'error');
+    }
+};
+
+
+// {
+//     "senderId": "65fd5affa3f37a4c9811cad1",
+//     "reciverId":"65fd69cb95af4f4df7d1f159"
+   
+    
+//   }

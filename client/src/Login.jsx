@@ -46,7 +46,6 @@ export default function SignInSide() {
       console.log("email", email, " password: ", pass); // Corrected "password" to "pass"
       try {
           const response = await axios.post('http://localhost:3000/api/login', { email, pass });
-          console.log(response.data)
           localStorage.setItem('token', response.data.token);
           navigate('/home'); // Redirect to profile page after successful login
         } catch (error) {

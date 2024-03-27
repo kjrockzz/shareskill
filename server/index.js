@@ -48,7 +48,7 @@ const database = module.exports =()=>{
     } catch (error) { 
         console.log(error)
         console.log("database connection failed");  
-    }
+    } 
 }
 
 database();
@@ -68,4 +68,4 @@ function authenticateToken(req, res, next) {
 }
 exports.getProfile =(authenticateToken, (req, res) => {
     res.json(req.user);
-});
+});   

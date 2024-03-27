@@ -7,4 +7,5 @@ router.get('/conversation/:userId', converController.getconversations);
 router.post('/message',converController.messages);
 router.get('/message/:conversationId', converController.getmessages);
 router.get('/users', converController.getusers);
+router.get('/conversation/:userId/:senderId', converController.startConversation)
 module.exports = router;

@@ -4,6 +4,6 @@ const projController = require("../controllers/projController");
 
 router.post('/newProj', projController.upload);
 
-router.get('/allProj/user', projController.getproj);
+router.get('/allProj', projController.getproj);
 
 module.exports = router;

@@ -7,4 +7,5 @@ router.post('/register', AuthController.register);
 router.post('/login', AuthController.login);
 router.post('/skill', AuthController.addSkill);
 router.get('/getSkills', AuthController.getSkills);
+router.get('/getuser/:userId', AuthController.user);
 module.exports = router;
